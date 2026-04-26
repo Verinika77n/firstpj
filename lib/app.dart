@@ -24,6 +24,23 @@ class CinemaLibraryApp extends StatelessWidget {
   late final GoRouter _router = GoRouter(
     initialLocation: '/splash',
     refreshListenable: _authNotifier,
+    redirect: (_, state) {
+      final bool isAuth = _authNotifier.isAuthorized;
+      final String location = state.matchedLocation;
+      final bool isAuthRoute =
+          location == '/logged-out' || location == '/login' || location.startsWith('/register');
+
+      if (location == '/splash') {
+        return null;
+      }
+      if (!isAuth && location.startsWith('/main')) {
+        return '/logged-out';
+      }
+      if (isAuth && isAuthRoute) {
+        return '/main/home';
+      }
+      return null;
+    },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
       GoRoute(path: '/logged-out', builder: (_, __) => const LoggedOutScreen()),

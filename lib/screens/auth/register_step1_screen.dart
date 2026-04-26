@@ -4,8 +4,33 @@ import 'package:go_router/go_router.dart';
 import '../../widgets/collage_background.dart';
 import '../../widgets/social_auth_row.dart';
 
-class RegisterStep1Screen extends StatelessWidget {
+class RegisterStep1Screen extends StatefulWidget {
   const RegisterStep1Screen({super.key});
+
+  @override
+  State<RegisterStep1Screen> createState() => _RegisterStep1ScreenState();
+}
+
+class _RegisterStep1ScreenState extends State<RegisterStep1Screen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() {
+    if (!_emailController.text.contains('@') || _codeController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Проверьте почту и код подтверждения')),
+      );
+      return;
+    }
+    context.go('/register/step2');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +46,12 @@ class RegisterStep1Screen extends StatelessWidget {
                 children: [
                   const Text('Регистрация — шаг 1', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 24),
-                  const TextField(decoration: InputDecoration(labelText: 'Электронная почта')),
+                  TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Электронная почта')),
                   const SizedBox(height: 12),
-                  const TextField(decoration: InputDecoration(labelText: 'Код')),
+                  TextField(controller: _codeController, decoration: const InputDecoration(labelText: 'Код')),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.go('/register/step2'),
+                    onPressed: _nextStep,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF5C4CDB),
                       foregroundColor: Colors.white,
@@ -35,7 +60,11 @@ class RegisterStep1Screen extends StatelessWidget {
                     child: const Text('Подтвердить'),
                   ),
                   const SizedBox(height: 18),
-                  const SocialAuthRow(),
+                  SocialAuthRow(
+                    onTap: (provider) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Регистрация через $provider пока в разработке')),
+                    ),
+                  ),
                 ],
               ),
             ),

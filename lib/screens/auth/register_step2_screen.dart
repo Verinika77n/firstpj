@@ -15,6 +15,35 @@ class RegisterStep2Screen extends StatefulWidget {
 
 class _RegisterStep2ScreenState extends State<RegisterStep2Screen> {
   bool _obscurePassword = true;
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatController = TextEditingController();
+
+  @override
+  void dispose() {
+    _loginController.dispose();
+    _passwordController.dispose();
+    _repeatController.dispose();
+    super.dispose();
+  }
+
+  void _register() {
+    if (_loginController.text.trim().isEmpty || _passwordController.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Введите логин и пароль не короче 6 символов')),
+      );
+      return;
+    }
+    if (_passwordController.text != _repeatController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пароли не совпадают')),
+      );
+      return;
+    }
+
+    context.read<AuthNotifier>().login();
+    context.go('/main/home');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +59,10 @@ class _RegisterStep2ScreenState extends State<RegisterStep2Screen> {
                 children: [
                   const Text('Регистрация — шаг 2', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 24),
-                  const TextField(decoration: InputDecoration(labelText: 'Логин')),
+                  TextField(controller: _loginController, decoration: const InputDecoration(labelText: 'Логин')),
                   const SizedBox(height: 12),
                   TextField(
+                    controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Пароль',
@@ -44,15 +74,13 @@ class _RegisterStep2ScreenState extends State<RegisterStep2Screen> {
                   ),
                   const SizedBox(height: 12),
                   TextField(
+                    controller: _repeatController,
                     obscureText: _obscurePassword,
                     decoration: const InputDecoration(labelText: 'Повторите пароль'),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthNotifier>().login();
-                      context.go('/main/home');
-                    },
+                    onPressed: _register,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF5C4CDB),
                       foregroundColor: Colors.white,
@@ -61,7 +89,11 @@ class _RegisterStep2ScreenState extends State<RegisterStep2Screen> {
                     child: const Text('Зарегистрироваться'),
                   ),
                   const SizedBox(height: 18),
-                  const SocialAuthRow(),
+                  SocialAuthRow(
+                    onTap: (provider) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Регистрация через $provider пока в разработке')),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -45,7 +45,11 @@ class LoggedOutScreen extends StatelessWidget {
                     child: const Text('Зарегистрироваться'),
                   ),
                   const SizedBox(height: 22),
-                  const SocialAuthRow(),
+                  SocialAuthRow(
+                    onTap: (provider) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Вход через $provider пока в разработке')),
+                    ),
+                  ),
                 ],
               ),
             ),

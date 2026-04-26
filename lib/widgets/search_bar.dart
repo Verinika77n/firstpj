@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppSearchBar extends StatelessWidget {
-  const AppSearchBar({super.key});
+  const AppSearchBar({
+    super.key,
+    this.controller,
+    this.onChanged,
+    this.onFilterTap,
+  });
+
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onFilterTap;
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +23,10 @@ class AppSearchBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFF34344A)),
             ),
-            child: const TextField(
-              decoration: InputDecoration(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Поиск фильмов',
                 prefixIcon: Icon(Icons.search, color: Colors.white70),
@@ -31,7 +42,7 @@ class AppSearchBar extends StatelessWidget {
             border: Border.all(color: const Color(0xFF34344A)),
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: onFilterTap,
             icon: const Icon(Icons.tune, color: Colors.white),
           ),
         ),

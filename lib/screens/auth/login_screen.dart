@@ -15,6 +15,26 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _loginController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_loginController.text.trim().isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Введите логин и пароль')),
+      );
+      return;
+    }
+    context.read<AuthNotifier>().login();
+    context.go('/main/home');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Text('Вход', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 24),
-                  const TextField(decoration: InputDecoration(labelText: 'Логин')),
+                  TextField(controller: _loginController, decoration: const InputDecoration(labelText: 'Логин')),
                   const SizedBox(height: 12),
                   TextField(
+                    controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Пароль',
@@ -44,10 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthNotifier>().login();
-                      context.go('/main/home');
-                    },
+                    onPressed: _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF5C4CDB),
                       foregroundColor: Colors.white,
@@ -56,7 +74,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Войти'),
                   ),
                   const SizedBox(height: 18),
-                  const SocialAuthRow(),
+                  SocialAuthRow(
+                    onTap: (provider) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Авторизация через $provider пока в разработке')),
+                    ),
+                  ),
                 ],
               ),
             ),
